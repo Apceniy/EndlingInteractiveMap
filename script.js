@@ -1,4 +1,3 @@
-const RES_BASE_PATH = 'https://raw.githubusercontent.com/Apceniy/EndlingInteractiveMap/main/';
 var ui = {mapX: 1000, mapY: 500, mapScale: 0.5, isDragging: false};
 const MAPW = 5760, MAPH = 3240, MAX_OFFBOUNDS = 0.5;
 
@@ -11,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	map = document.getElementById("map");
 	markers_promise.then(() => {
 		console.log(markers_info);
-		map.style.backgroundImage = `url('${RES_BASE_PATH}assets/map0.png')`;
+		map.style.backgroundImage = `url('assets/map0.png')`;
 		setMapScale(ui.mapScale);
 		setMapPos(ui.mapX, ui.mapY);
 	});
