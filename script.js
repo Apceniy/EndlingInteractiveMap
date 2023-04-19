@@ -15,43 +15,40 @@ document.addEventListener("DOMContentLoaded", () => {
 		setMapPos(ui.mapX, ui.mapY);
 	});
 
-map.addEventListener("touchstart", (e) => {
-	ui.isDragging = true;
-	startTouchGesture(e);
-	e.preventDefault();
-});
-map.addEventListener("touchmove", (e) => {
-	debug.innerHTML = `Move<br>`;
-	debug.innerHTML += `${ui.touchCount} touches<br>`;
-	if (ui.touchCount != e.targetTouches.length) {
+	map.addEventListener("touchstart", (e) => {
+		ui.isDragging = true;
 		startTouchGesture(e);
-		return;
-	}
-	let avgX = Array.prototype.reduce.call(e.targetTouches, (acc, touch) => acc + touch.clientX, 0)
-		/ e.targetTouches.length;
-	let avgY = Array.prototype.reduce.call(e.targetTouches, (acc, touch) => acc + touch.clientY, 0)
-		/ e.targetTouches.length;
-	drag(avgX, avgY);
-	map.children[0].style.left = avgX+"px";
-	map.children[0].style.top = avgY+"px";
-	debug.innerHTML += `X: ${ui.dragStartX}<br>`;
-	debug.innerHTML += `Y: ${ui.dragStartY}<br>`;
-	//map.children[1].style.left = (ui.dragStartX-ui.mapX)*ui.mapScale+"px";
-	//map.children[1].style.top = (ui.dragStartY-ui.mapY)*ui.mapScale+"px";
+		e.preventDefault();
+	});
+	map.addEventListener("touchmove", (e) => {
+		debug.innerHTML = `Move<br>`;
+		debug.innerHTML += `${ui.touchCount} touches<br>`;
+		if (ui.touchCount != e.targetTouches.length) {
+			startTouchGesture(e);
+			return;
+		}
+		let avgX = Array.prototype.reduce.call(e.targetTouches, (acc, touch) => acc + touch.clientX, 0)
+			/ e.targetTouches.length;
+		let avgY = Array.prototype.reduce.call(e.targetTouches, (acc, touch) => acc + touch.clientY, 0)
+			/ e.targetTouches.length;
+		drag(avgX, avgY);
+		map.children[0].style.left = avgX+"px";
+		map.children[0].style.top = avgY+"px";
+		debug.innerHTML += `X: ${ui.dragStartX}<br>`;
+		debug.innerHTML += `Y: ${ui.dragStartY}<br>`;
 
-	// Calculate new average touch distance if we're currently pinching
-	if (ui.pinchStart !== null && e.targetTouches.length > 1) {
-		let avgDistance = Array.prototype.reduce.call(e.targetTouches, (acc, touch) => {
-			return acc + Math.hypot(touch.clientX - (ui.dragStartX-ui.mapX)*ui.mapScale, touch.clientY - (ui.dragStartY-ui.mapY)*ui.mapScale);
-		}, 0) / e.targetTouches.length;
+		// Calculate new average touch distance if we're currently pinching
+		if (ui.pinchStart !== null && e.targetTouches.length > 1) {
+			let avgDistance = Array.prototype.reduce.call(e.targetTouches, (acc, touch) => {
+				return acc + Math.hypot(touch.clientX - (ui.dragStartX-ui.mapX)*ui.mapScale, touch.clientY - (ui.dragStartY-ui.mapY)*ui.mapScale);
+			}, 0) / e.targetTouches.length;
 
-		debug.innerHTML += `Pinch ${ui.pinchStart}<br>`;
-		debug.innerHTML += `Avg ${avgDistance}<br>`;
-		// Calculate pinch scale factor based on change in average distance
-		scale(avgDistance * ui.pinchStart / ui.mapScale, avgX, avgY);
-	}
-	e.preventDefault();
-});
+			debug.innerHTML += `Pinch ${ui.pinchStart}<br>`;
+			debug.innerHTML += `Avg ${avgDistance}<br>`;
+			scale(avgDistance * ui.pinchStart / ui.mapScale, avgX, avgY);
+		}
+		e.preventDefault();
+	});
 	map.addEventListener("touchend", (e) => {
 		if (e.targetTouches.length == 0)
 			ui.isDragging = false;
@@ -68,7 +65,7 @@ map.addEventListener("touchmove", (e) => {
 		else
 			drag(e.clientX, e.clientY);
 	});
-	map.addEventListener('mousewheel', (e) => {
+	map.addEventListener('wheel', (e) => {
 		if (!e.ctrlKey)
 			scale(1-Math.sign(e.deltaY)*0.3, e.clientX, e.clientY);
 	});
@@ -91,8 +88,7 @@ function startTouchGesture(e) {
 		ui.pinchStart = ui.mapScale / avgDistance;
 		debug.innerHTML += `Pinch ${ui.pinchStart}<br>`;
 		debug.innerHTML += `Avg ${avgDistance}<br>`;
-	}
-	else
+	} else
 		ui.pinchStart = null;
 }
 
@@ -123,5 +119,4 @@ function setMapScale(factor) {
 	let maxScale = 1;
 	ui.mapScale = Math.min(maxScale, Math.max(minScale, factor));
 	map.style.backgroundSize = MAPW / map.clientWidth * ui.mapScale * 100 + "%";
-	console.log("Scale:", ui.mapScale);
 }
